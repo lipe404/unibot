@@ -6,6 +6,7 @@
         <meta name="description" content="UniBot - O bot de respostas.">
         <meta name="keywords" content="UniBot, bot, respostas, perguntas, chat, inteligência artificial">
         <meta name="author" content="@spaceman.404">
+        <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
         <title>UniBot</title>
         <link rel="stylesheet" href="estilos/style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -21,7 +22,7 @@
         </header>
         <!-- Conteúdo Principal -->
         <main class="chat-container">
-            <div class="chat-history" id="chatHistory">
+            <div class="chat-history" id="chatHistory" role="log" aria-live="polite">
                 <!-- Mensagens do chat serão inseridas aqui -->
                  <div class="welcome-message">
                     <p>Bem-vindo ao UniBot! Como posso ajudar você hoje?</p>
@@ -31,7 +32,7 @@
                 <input type="text" id="userInput" placeholder="Digite sua pergunta..." autofocus>
                 <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
                 <div class="file-upload">
-                    <label for="fileInput">
+                    <label for="fileInput" id="fileLabel">
                         <i class="fas fa-file-upload"></i> Enviar documento
                     </label>
                     <input type="file" id="fileInput" accept=".pdf, .doc, .docx, .txt">
