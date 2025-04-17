@@ -5,6 +5,10 @@ import PyPDF2
 from docx import Document
 import os
 import logging
+import openai
+from dotenv import load_dotenv
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +61,6 @@ def process_document(file_path):
         else:
             raise ValueError("Tipo de arquivo não suportado")
 
-        # Aqui você enviaria o texto para a API de IA para indexação/processamento
-        # Por exemplo: indexar o documento no seu sistema de busca
-
         return {
             'file_name': os.path.basename(file_path),
             'text_length': len(text),
@@ -75,13 +76,17 @@ def query_ai_model(query):
     Função para consultar o modelo de IA com a pergunta do usuário
     (Implemente a integração com a API de IA escolhida aqui)
     """
-    # Exemplo de implementação básica - substitua pela sua API real
-    # Você pode usar OpenAI, HuggingFace, ou outra API de sua escolha
-
-    # Implementação fictícia - substitua pela chamada real à API
-    if "horário" in query.lower():
-        return "O horário de funcionamento do Centro Universitário Única é de segunda a sexta, das 8h às 22h."
-    elif "curso" in query.lower():
-        return "Oferecemos diversos cursos nas áreas de tecnologia, negócios e saúde. Posso te indicar o site com a lista completa."
-    else:
-        return "Entendi sua pergunta sobre: " + query + ". Estou aprendendo a responder melhor cada dia!"
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Você é o UniBot, assistente virtual do Centro Universitário Única. Responda de forma educada e útil."},
+                {"role": "user", "content": query}
+            ],
+            temperature=0.7,
+            max_tokens=500
+        )
+        return response.choices[0].message['content']
+    except Exception as e:
+        logger.error(f"Erro ao consultar OpenAI: {str(e)}")
+        return "Desculpe, estou tendo dificuldades para processar sua pergunta no momento."
