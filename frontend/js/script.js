@@ -135,4 +135,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Enter') sendMessage();
     });
     fileInput.addEventListener('change', handleFileUpload);
+
+    fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("http://localhost:8000/upload/", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+    console.log("Arquivo processado:", result);
+});
+
 });
