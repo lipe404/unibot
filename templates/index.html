@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unibot - Assistente Virtual</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <h1><i class="fas fa-robot"></i> Unibot</h1>
+          <p>Assistente Virtual para Parceiros Comerciais</p>
+        </div>
+      </header>
+
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="message bot-message">
+            <div class="message-content">
+              <i class="fas fa-robot"></i>
+              <div class="text">
+                Olá! Sou o Unibot, seu assistente virtual. Como posso ajudá-lo
+                hoje?
+              </div>
+            </div>
+            <div class="timestamp" id="initialTimestamp"></div>
+          </div>
+        </div>
+
+        <div class="chat-input-container">
+          <div class="input-group">
+            <input
+              type="text"
+              id="messageInput"
+              placeholder="Digite sua pergunta..."
+              maxlength="500"
+            />
+            <button id="sendButton" type="button">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="input-info">
+            <span id="charCount">0/500</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator" style="display: none">
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span>Unibot está digitando...</span>
+      </div>
+
+      <footer class="footer">
+        <p>
+          &copy; 2024 Unibot. Desenvolvido para suporte a parceiros comerciais.
+        </p>
+        <a href="/admin" class="admin-link">
+          <i class="fas fa-cog"></i> Área Administrativa
+        </a>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+  </body>
+</html>
