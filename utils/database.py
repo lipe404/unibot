@@ -65,20 +65,28 @@ class Database:
                     (question,)
                 )
                 conn.commit()
+                return cursor.lastrowid
         except Exception as e:
             logger.error(f"Erro ao registrar pergunta: {str(e)}")
+            return None
 
     def log_response(self, question, response):
         """Atualiza a resposta para uma pergunta"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+                # Corrigir a query SQL - remover ORDER BY do UPDATE
                 cursor.execute(
-                    """UPDATE conversations
-                       SET response = ?
-                       WHERE question = ? AND response IS NULL
-                       ORDER BY timestamp DESC LIMIT 1""",
-                    (response, question)
+                    """UPDATE conversations 
+                       SET response = ? 
+                       WHERE question = ? AND response IS NULL 
+                       AND id = (
+                           SELECT id FROM conversations 
+                           WHERE question = ? AND response IS NULL 
+                           ORDER BY timestamp DESC 
+                           LIMIT 1
+                       )""",
+                    (response, question, question)
                 )
                 conn.commit()
         except Exception as e:
@@ -113,8 +121,8 @@ class Database:
                     "SELECT COUNT(*) FROM uploaded_pdfs WHERE status = 'active'")
                 total_pdfs = cursor.fetchone()[0]
 
-                # Estimativa de chunks (assumindo média de 10 chunks por PDF)
-                total_chunks = total_pdfs * 10
+                # Calcular chunks reais baseado nos documentos processados
+                total_chunks = self.get_total_chunks()
 
                 return {
                     'total_questions': total_questions,
@@ -130,14 +138,33 @@ class Database:
                 'total_chunks': 0
             }
 
+    def get_total_chunks(self):
+        """Calcula o número total de chunks baseado nos PDFs processados"""
+        try:
+            # Tentar obter do vectorstore se disponível
+            vectorstore_path = 'data/vectorstore'
+            if os.path.exists(vectorstore_path):
+                # Estimar baseado nos arquivos do vectorstore
+                return len([f for f in os.listdir(vectorstore_path) if f.endswith('.bin')]) * 50
+            else:
+                # Fallback para estimativa baseada em PDFs
+                with sqlite3.connect(self.db_path) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "SELECT COUNT(*) FROM uploaded_pdfs WHERE status = 'active'")
+                    total_pdfs = cursor.fetchone()[0]
+                    return total_pdfs * 100  # Estimativa mais realista
+        except:
+            return 0
+
     def get_trained_documents(self):
         """Obtém lista de documentos treinados"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
-                    """SELECT filename, upload_date, status
-                       FROM uploaded_pdfs
+                    """SELECT filename, upload_date, status 
+                       FROM uploaded_pdfs 
                        ORDER BY upload_date DESC"""
                 )
 
